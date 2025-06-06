@@ -3,6 +3,9 @@
     "Debug": {
       "commandName": "DebugRoslynComponent",
       "targetProject": "..\\BlueprintLib.Example\\BlueprintLib.Example.csproj"
+    },
+    "Profil 1": {
+      "commandName": "Project"
     }
   }
 }

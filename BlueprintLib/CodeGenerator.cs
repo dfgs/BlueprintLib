@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Data.SqlTypes;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -45,11 +46,11 @@ namespace BlueprintLib
         public void Initialize(IncrementalGeneratorInitializationContext context)
 		{
             IncrementalValuesProvider<TypeDeclarationSyntax?> syntaxNodeProvider;
-            
 
+			Debugger.Break();
 
-            // register static files
-            context.RegisterPostInitializationOutput(incrementalGeneratorPostInitializationContext => incrementalGeneratorPostInitializationContext.AddSource("Attributes/BlueprintAttribute.g.cs", SourceText.From(ClassBlueprintAttributeSourceCode, Encoding.UTF8)));
+			// register static files
+			context.RegisterPostInitializationOutput(incrementalGeneratorPostInitializationContext => incrementalGeneratorPostInitializationContext.AddSource("Attributes/BlueprintAttribute.g.cs", SourceText.From(ClassBlueprintAttributeSourceCode, Encoding.UTF8)));
 
             /*var someInfo = context.AnalyzerConfigOptionsProvider
 			.Select(static (ctx, _) => {
@@ -65,7 +66,7 @@ namespace BlueprintLib
 
 			syntaxNodeProvider = context.SyntaxProvider.CreateSyntaxProvider
 			(
-				(syntaxNode, cancellationToken) => (syntaxNode is ClassDeclarationSyntax classDeclatationSyntax) && (classDeclatationSyntax.ContainsAttribute("BlueprintLib.Attributes.ClassBlueprintAttribute")),
+				(syntaxNode, cancellationToken) => (syntaxNode is ClassDeclarationSyntax classDeclatationSyntax) /*&& (classDeclatationSyntax.ContainsAttribute("BlueprintLib.Attributes.ClassBlueprintAttribute"))*/,
 				transform: static (GeneratorSyntaxContext, _) => GeneratorSyntaxContext.Node as TypeDeclarationSyntax
 			)
 			.Where(classDeclarationSyntax => classDeclarationSyntax != null);
