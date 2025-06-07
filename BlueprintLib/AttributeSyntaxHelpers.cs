@@ -11,9 +11,28 @@ namespace BlueprintLib
 	public static class AttributeSyntaxHelpers
 	{
 
-		
 
-		public static bool ContainsAttribute(this AttributeSyntax AttributeSyntax, SemanticModel SemanticModel, string AttributeName)
+
+
+
+
+		/*public static string? GetTableName(this AttributeSyntax AttributeSyntax)
+		{
+			if (AttributeSyntax.ArgumentList==null) return null;
+			if (AttributeSyntax.ArgumentList.Arguments.Count == 0) return null;
+			return AttributeSyntax.ArgumentList.Arguments[0].GetText().ToString();
+		}*/
+		public static string? GetTemplateName(this INamedTypeSymbol NodeSymbol)
+		{
+			AttributeData? attributeData = NodeSymbol.GetAttribute("BlueprintLib.Attributes.ClassBlueprintAttribute");
+			if ((attributeData == null) || (attributeData.ConstructorArguments.Length < 1)) return null;
+
+			string? templateName = attributeData.ConstructorArguments[0].Value?.ToString();
+			return templateName;
+
+		}
+
+		private static bool ContainsAttribute(this AttributeSyntax AttributeSyntax, SemanticModel SemanticModel, string AttributeName)
 		{
 			if (SemanticModel.GetSymbolInfo(AttributeSyntax).Symbol is IMethodSymbol attributeSymbol)
 			{
@@ -23,28 +42,15 @@ namespace BlueprintLib
 
 			return false;
 		}
-		
 
-		public static string? GetTableName(this AttributeSyntax AttributeSyntax)
-		{
-			if (AttributeSyntax.ArgumentList==null) return null;
-			if (AttributeSyntax.ArgumentList.Arguments.Count == 0) return null;
-			return AttributeSyntax.ArgumentList.Arguments[0].GetText().ToString();
-		}
-        public static bool ContainsAttribute(this TypeDeclarationSyntax Node, string AttributeName)
-        {
-			foreach(AttributeSyntax attributeSyntax in Node.AttributeLists.SelectMany(item=>item.Attributes))
-			{
-				if (attributeSyntax.GetText().ToString() == AttributeName) return true;
-			}
-			return false;
-        }
 
-        public static bool ContainsAttribute(this SyntaxNode Node, Compilation Compilation, string AttributeName)
+		public static bool ContainsAttribute(this SyntaxNode Node, Compilation Compilation, string AttributeName)
 		{
 			SemanticModel semanticModel = Compilation.GetSemanticModel(Node.SyntaxTree);
 			return Node.GetAttributeSyntax(semanticModel, AttributeName) != null;
 		}
+
+
 
 		public static bool ContainsAttribute(this SyntaxNode Node, SemanticModel SemanticModel, string AttributeName)
 		{

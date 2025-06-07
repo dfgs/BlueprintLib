@@ -47,45 +47,44 @@ namespace BlueprintLib
 		{
             IncrementalValuesProvider<TypeDeclarationSyntax?> syntaxNodeProvider;
 
-			Debugger.Break();
+			IncrementalValuesProvider<(string FileName,string Content)> blueprintFileProvider;
 
 			// register static files
 			context.RegisterPostInitializationOutput(incrementalGeneratorPostInitializationContext => incrementalGeneratorPostInitializationContext.AddSource("Attributes/BlueprintAttribute.g.cs", SourceText.From(ClassBlueprintAttributeSourceCode, Encoding.UTF8)));
 
-            /*var someInfo = context.AnalyzerConfigOptionsProvider
-			.Select(static (ctx, _) => {
-				if (ctx.GlobalOptions.TryGetValue("build_property.someInfo", out var info))
-				{
-					return info;
-				}
-				return null;
-			});*/
-
-            var blueprintFileProvider = context.AdditionalTextsProvider.Where(additionalText => Path.GetExtension(additionalText.Path)==".bp").Select((additionalText, cancellationToken) => additionalText.GetText(cancellationToken)!.ToString());
-
+			
+			blueprintFileProvider = context.AdditionalTextsProvider.Where(additionalText =>
+			Path.GetExtension(additionalText.Path) == ".bp")
+				.Select((additionalText, cancellationToken) =>
+				(Path.GetFileName(additionalText.Path), additionalText.GetText(cancellationToken)!.ToString())
+				);
+			
 
 			syntaxNodeProvider = context.SyntaxProvider.CreateSyntaxProvider
 			(
-				(syntaxNode, cancellationToken) => (syntaxNode is ClassDeclarationSyntax classDeclatationSyntax) /*&& (classDeclatationSyntax.ContainsAttribute("BlueprintLib.Attributes.ClassBlueprintAttribute"))*/,
+				(syntaxNode, cancellationToken) => (syntaxNode is ClassDeclarationSyntax classDeclatationSyntax) ,
 				transform: static (GeneratorSyntaxContext, _) => GeneratorSyntaxContext.Node as TypeDeclarationSyntax
 			)
 			.Where(classDeclarationSyntax => classDeclarationSyntax != null);
-			
 
 
-			IncrementalValueProvider<(Compilation Compilation,ImmutableArray<TypeDeclarationSyntax?> Right)> syntaxNodeWithCompilationtest = context.CompilationProvider.Combine(syntaxNodeProvider.Collect());
+
+			IncrementalValueProvider<((Compilation Compilation, ImmutableArray<TypeDeclarationSyntax?> ClassDeclarationSyntaxArray) CompilationAndClassDeclarationSyntaxArray, ImmutableArray<(string FileName, string Content)> BlueprintFileNamesArray)> syntaxNodeWithCompilationtest = 
+				context.CompilationProvider.Combine(syntaxNodeProvider.Collect())
+				.Combine(blueprintFileProvider.Collect())
+				;
 			
-			//var source = context.CompilationProvider.Combine(syntaxNodeProvider.Collect());
             
             context.RegisterSourceOutput
 			(
                 syntaxNodeWithCompilationtest,
-				(sourceProductionContext, source) => GenerateDynamicSources(context,sourceProductionContext, source.Compilation,source.Right)
+				(sourceProductionContext, source) => GenerateDynamicSources(context,sourceProductionContext, source.CompilationAndClassDeclarationSyntaxArray.Compilation,source.CompilationAndClassDeclarationSyntaxArray.ClassDeclarationSyntaxArray,source.BlueprintFileNamesArray)
 			);
 
-			
 
-			
+
+
+
 		}
 
 
@@ -121,58 +120,46 @@ namespace BlueprintLib
 			return (currentNode, SourceGenerationType.Ignore);
 		}*/
 
-		private void GenerateDynamicSources(IncrementalGeneratorInitializationContext context, SourceProductionContext sourceProductionContext, Compilation compilation, IEnumerable<TypeDeclarationSyntax?> Declarations)
+		private void GenerateDynamicSources(IncrementalGeneratorInitializationContext context, SourceProductionContext sourceProductionContext, Compilation compilation, IEnumerable<TypeDeclarationSyntax?> Declarations, IEnumerable<(string FileName, string Content)> Blueprints)
 		{
 			foreach(TypeDeclarationSyntax? declaration in Declarations)
 			{
-				GenerateClassDynamicSources(context,sourceProductionContext, compilation,declaration); 
+				GenerateClassDynamicSources(context,sourceProductionContext, compilation,declaration, Blueprints); 
 			}
         }
 
-        private void GenerateClassDynamicSources(IncrementalGeneratorInitializationContext context, SourceProductionContext sourceProductionContext, Compilation compilation, TypeDeclarationSyntax? ClassDeclarationSyntax)
+        private void GenerateClassDynamicSources(IncrementalGeneratorInitializationContext context, SourceProductionContext sourceProductionContext, Compilation compilation, TypeDeclarationSyntax? ClassDeclarationSyntax, IEnumerable<(string FileName, string Content)> Blueprints)
         {
             INamedTypeSymbol? typeSymbol;
             string nameSpace;
 			string className;
 
-			AttributeData? attributeData;
 			string? templateName;
             string source;
+			string? template;
 
 
             if (ClassDeclarationSyntax == null) return;
 
-            //Template template = Template.ParseLiquid(TemplateSource);
-            /*
-            // Parse a liquid template
-            IncrementalValuesProvider<string> blueprints = context.AdditionalTextsProvider.Where(additionalText => additionalText.Path.EndsWith("blueprintAttribute.bp")).Select((additionalText,cancellationToken) => additionalText.GetText(cancellationToken)!.ToString());
-            context.RegisterSourceOutput(blueprints, (context, TemplateSource) =>context.AddSource("test.cs",  SourceText.From(GenerateSourceCodeFromTemplate( TemplateSource), Encoding.UTF8) ));
-			*/
-
-            // On récupère le modèle sémantique pour pouvoir manipuler les méta données et le contenu de nos objets 
-            typeSymbol = ClassDeclarationSyntax.GetTypeSymbol<INamedTypeSymbol>(compilation);
+			// On récupère le modèle sémantique pour pouvoir manipuler les méta données et le contenu de nos objets 
+			typeSymbol = ClassDeclarationSyntax.GetTypeSymbol<INamedTypeSymbol>(compilation);
             if (typeSymbol == null) return;
 
-            // On récupère le namespace, le nom du noeud courant et on créé le nom du futur DTO
-            nameSpace = typeSymbol.ContainingNamespace.ToDisplayString();
-            className = ClassDeclarationSyntax.Identifier.Text;
 
-			
-			var test = context.AdditionalTextsProvider.Where(additionalText=>additionalText.Path!=null);
-
-			attributeData = typeSymbol.GetAttribute("BlueprintLib.Attributes.ClassBlueprintAttribute");
-            if ((attributeData == null) || (attributeData.ConstructorArguments.Length==0)) return;
-            
-			templateName = attributeData.ConstructorArguments[0].Value?.ToString();
+			templateName = typeSymbol.GetTemplateName();
 			if (templateName == null) return;
 
-			using (FileStream stream = new FileStream(templateName, FileMode.Open))
-			{
-				TextReader reader = new StreamReader(stream);
-				source= reader.ReadToEnd();
-			}
+			template = Blueprints.FirstOrDefault(item => item.FileName == templateName).Content;
+			if (template == null) return;
+
+			// Parse a liquid template
+			//Template template = Template.ParseLiquid(TemplateSource);
+
+			// On récupère le namespace, le nom du noeud courant et on créé le nom du futur DTO
+			nameSpace = typeSymbol.ContainingNamespace.ToDisplayString();
+            className = ClassDeclarationSyntax.Identifier.Text;
 			
-            //source = $"// {templateName}";
+            source = template;
             sourceProductionContext.AddSource($"{className}.g.cs", SourceText.From(source, Encoding.UTF8));
 
         }

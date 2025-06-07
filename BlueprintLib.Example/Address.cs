@@ -7,7 +7,7 @@ using BlueprintLib.Attributes;
 
 namespace BlueprintLib.Example
 {
-    [ClassBlueprint( @"Blueprints\Table.bp")]
+    [ClassBlueprint( @"Table.bp")]
 	public class Address 
 	{
 		//[Column,PrimaryKey]

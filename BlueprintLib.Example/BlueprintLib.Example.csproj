@@ -11,4 +11,8 @@
 		<ProjectReference Include="..\BlueprintLib\BlueprintLib.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<AdditionalFiles Include="Blueprints\Table.bp" />
+	</ItemGroup>
+
 </Project>
