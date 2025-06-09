@@ -22,13 +22,16 @@ namespace BlueprintLib
 			if (AttributeSyntax.ArgumentList.Arguments.Count == 0) return null;
 			return AttributeSyntax.ArgumentList.Arguments[0].GetText().ToString();
 		}*/
-		public static string? GetTemplateName(this INamedTypeSymbol NodeSymbol)
+		public static IEnumerable<string> GetTemplateNames(this INamedTypeSymbol NodeSymbol)
 		{
-			AttributeData? attributeData = NodeSymbol.GetAttribute("BlueprintLib.Attributes.ClassBlueprintAttribute");
-			if ((attributeData == null) || (attributeData.ConstructorArguments.Length < 1)) return null;
+			foreach(AttributeData attributeData in NodeSymbol.GetAttributes().Where(item => item.AttributeClass?.ToString() == "BlueprintLib.Attributes.ClassBlueprintAttribute") )
+			{
+				if (attributeData.ConstructorArguments.Length < 1) continue;
+				string? templateName = attributeData.ConstructorArguments[0].Value?.ToString();
+				if (templateName == null) continue;
+				yield return templateName;
 
-			string? templateName = attributeData.ConstructorArguments[0].Value?.ToString();
-			return templateName;
+			}
 
 		}
 

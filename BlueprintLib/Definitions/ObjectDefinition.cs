@@ -6,11 +6,12 @@ using System.Text;
 
 namespace BlueprintLib
 {
-	public abstract class SchemaObject
+	public abstract class ObjectDefinition
 	{
+
 		
-		
-		public SchemaObject()
+
+		public ObjectDefinition()
 		{
 		}
 
