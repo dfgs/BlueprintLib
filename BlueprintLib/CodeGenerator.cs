@@ -28,7 +28,7 @@ namespace BlueprintLib
 		
 		namespace BlueprintLib.Attributes
 		{
-			[AttributeUsage(AttributeTargets.Class)]
+			[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
 			public class ClassBlueprintAttribute : Attribute
 			{
 				public string Name
@@ -51,7 +51,7 @@ namespace BlueprintLib
 
 
 			// register static files
-			context.RegisterPostInitializationOutput(incrementalGeneratorPostInitializationContext => incrementalGeneratorPostInitializationContext.AddSource("Attributes/BlueprintAttribute.g.cs", SourceText.From(ClassBlueprintAttributeSourceCode, Encoding.UTF8)));
+			context.RegisterPostInitializationOutput(incrementalGeneratorPostInitializationContext => incrementalGeneratorPostInitializationContext.AddSource("Attributes/ClassBlueprintAttribute.g.cs", SourceText.From(ClassBlueprintAttributeSourceCode, Encoding.UTF8)));
 
 			
 			blueprintFileProvider = context.AdditionalTextsProvider.Where(additionalText => Path.GetExtension(additionalText.Path) == ".bp")
@@ -156,7 +156,7 @@ namespace BlueprintLib
 						if (blueprint == null) source = $"#warning Blueprint {attributeParameterDefinition.Value} was not found, please check if compilation action is set to additional files";
 						else source = blueprint.Content;
 						
-						SourceProductionContext.AddSource($"{classDefinition.Name}.g.cs", SourceText.From(source, Encoding.UTF8));
+						SourceProductionContext.AddSource($"{classDefinition.Name}.{Path.GetFileNameWithoutExtension(attributeParameterDefinition.Value)}.g.cs", SourceText.From(source, Encoding.UTF8));
 
 					}
 				}
