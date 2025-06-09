@@ -13,6 +13,7 @@ using System.Text;
 using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
 
+
 namespace BlueprintLib
 {
 
@@ -142,6 +143,7 @@ namespace BlueprintLib
 			Blueprint? blueprint;
 			ProjectDefinition projectDefinition;
 			string source;
+			Scriban.Template template;
 
 			projectDefinition=GenerateProjectDefinition(Context, SourceProductionContext, SourceContext );
 
@@ -152,10 +154,15 @@ namespace BlueprintLib
 					foreach (AttributeParameterDefinition attributeParameterDefinition in attributeDefinition.Parameters.Where(item => item.Name == "Name"))
 					{
 						blueprint = SourceContext.Blueprints.FirstOrDefault(item => item.FileName == attributeParameterDefinition.Value);
-						
+
+
 						if (blueprint == null) source = $"#warning Blueprint {attributeParameterDefinition.Value} was not found, please check if compilation action is set to additional files";
-						else source = blueprint.Content;
-						
+						else
+						{
+							template = Scriban.Template.Parse(blueprint.Content);
+							source = template.Render(classDefinition);
+						}
+					
 						SourceProductionContext.AddSource($"{classDefinition.Name}.{Path.GetFileNameWithoutExtension(attributeParameterDefinition.Value)}.g.cs", SourceText.From(source, Encoding.UTF8));
 
 					}
