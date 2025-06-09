@@ -119,12 +119,12 @@ namespace BlueprintLib
 					if (attributeData.AttributeClass==null) continue;
 					attributeDefinition = new AttributeDefinition(attributeData.AttributeClass.ToString());
 					classDefinition.Attributes.Add(attributeDefinition);
+					if (attributeData.AttributeConstructor == null) continue;
 
-					foreach(TypedConstant constructorParameter in attributeData.ConstructorArguments)
+					for(int t=0;t< attributeData.AttributeConstructor.Parameters.Length;t++)
 					{
-						// need to get parameter name
-						string parameterName= constructorParameter.ToString();
-						string? parameterValue = constructorParameter.Value?.ToString();
+						string parameterName= attributeData.AttributeConstructor.Parameters[t].Name;
+						string? parameterValue = attributeData.ConstructorArguments[t].Value?.ToString();
 
 						attributeParameterDefinition = new AttributeParameterDefinition(parameterName, parameterValue);
 						attributeDefinition.Parameters.Add(attributeParameterDefinition);
