@@ -2,6 +2,8 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using Scriban;
+using Scriban.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -89,6 +91,41 @@ namespace BlueprintLib
 
 		}
 
+		private static IEnumerable<AttributeDefinition> GenerateAttributeDefinitions(ISymbol Symbol) 
+		{
+			AttributeDefinition attributeDefinition;
+			AttributeParameterDefinition attributeParameterDefinition;
+
+			foreach (AttributeData attributeData in Symbol.GetAttributes())
+			{
+				if (attributeData.AttributeClass == null) continue;
+				attributeDefinition = new AttributeDefinition(attributeData.AttributeClass.ToString());
+				if (attributeData.AttributeConstructor != null)
+				{
+					for (int t = 0; t < attributeData.AttributeConstructor.Parameters.Length; t++)
+					{
+						string parameterName = attributeData.AttributeConstructor.Parameters[t].Name;
+						string? parameterValue = attributeData.ConstructorArguments[t].Value?.ToString();
+
+						attributeParameterDefinition = new AttributeParameterDefinition(parameterName, parameterValue);
+						attributeDefinition.Parameters.Add(attributeParameterDefinition);
+					}
+				}
+				yield return attributeDefinition;
+			}
+		}
+		private static IEnumerable<PropertyDefinition> GeneratePropertyDefinitions(INamedTypeSymbol TypeSymbol)
+		{
+			PropertyDefinition propertyDefinition;
+			
+
+			foreach (IPropertySymbol propertySymbol in TypeSymbol.GetMembers().OfType<IPropertySymbol>())
+			{
+				propertyDefinition = new PropertyDefinition(propertySymbol.Name,propertySymbol.Type.ToString());
+				propertyDefinition.Attributes.AddRange(GenerateAttributeDefinitions(propertySymbol));
+				yield return propertyDefinition;
+			}
+		}
 
 		private static ProjectDefinition GenerateProjectDefinition(IncrementalGeneratorInitializationContext Context, SourceProductionContext SourceProductionContext,  SourceContext SourceContext)
 		{
@@ -98,8 +135,6 @@ namespace BlueprintLib
 
 			ProjectDefinition projectDefinition ;
 			ClassDefinition classDefinition;
-			AttributeDefinition attributeDefinition;
-			AttributeParameterDefinition attributeParameterDefinition; 
 
 
 			projectDefinition = new ProjectDefinition();
@@ -115,24 +150,8 @@ namespace BlueprintLib
 				classDefinition=new ClassDefinition(nameSpace, className);
 				projectDefinition.Classes.Add(classDefinition);
 
-				foreach (AttributeData attributeData in typeSymbol.GetAttributes())
-				{
-					if (attributeData.AttributeClass==null) continue;
-					attributeDefinition = new AttributeDefinition(attributeData.AttributeClass.ToString());
-					classDefinition.Attributes.Add(attributeDefinition);
-					if (attributeData.AttributeConstructor == null) continue;
-
-					for(int t=0;t< attributeData.AttributeConstructor.Parameters.Length;t++)
-					{
-						string parameterName= attributeData.AttributeConstructor.Parameters[t].Name;
-						string? parameterValue = attributeData.ConstructorArguments[t].Value?.ToString();
-
-						attributeParameterDefinition = new AttributeParameterDefinition(parameterName, parameterValue);
-						attributeDefinition.Parameters.Add(attributeParameterDefinition);
-					}
-
-				}
-
+				classDefinition.Attributes.AddRange(GenerateAttributeDefinitions(typeSymbol));
+				classDefinition.Properties.AddRange(GeneratePropertyDefinitions(typeSymbol));
 			}
 
 			return projectDefinition;
@@ -144,8 +163,10 @@ namespace BlueprintLib
 			ProjectDefinition projectDefinition;
 			string source;
 			Scriban.Template template;
+			TemplateContext templateContext;
+			ScriptObject scriptObject;
 
-			projectDefinition=GenerateProjectDefinition(Context, SourceProductionContext, SourceContext );
+			projectDefinition =GenerateProjectDefinition(Context, SourceProductionContext, SourceContext );
 
 			foreach (ClassDefinition classDefinition in projectDefinition.Classes)
 			{
@@ -159,8 +180,18 @@ namespace BlueprintLib
 						if (blueprint == null) source = $"#warning Blueprint {attributeParameterDefinition.Value} was not found, please check if compilation action is set to additional files";
 						else
 						{
-							template = Scriban.Template.Parse(blueprint.Content);
-							source = template.Render(classDefinition);
+							scriptObject = new ScriptObject();
+							scriptObject.Add("class", classDefinition);
+							// Declare a function `myfunc` returning the string `Yes`
+							scriptObject.Import("contains", new Func<IEnumerable<AttributeDefinition> ,string, bool>((attributes,name) => attributes.Any(item=>item.Name==name) ));
+
+							templateContext = new TemplateContext();
+							templateContext.PushGlobal(scriptObject);
+
+
+
+							template = Scriban.Template.ParseLiquid(blueprint.Content);
+							source = template.Render(templateContext);
 						}
 					
 						SourceProductionContext.AddSource($"{classDefinition.Name}.{Path.GetFileNameWithoutExtension(attributeParameterDefinition.Value)}.g.cs", SourceText.From(source, Encoding.UTF8));

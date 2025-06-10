@@ -7,7 +7,7 @@ using System.Text;
 
 namespace BlueprintLib
 {
-	public class ClassDefinition : ObjectDefinition
+	public class PropertyDefinition : ObjectDefinition
 	{
 
 		public List<AttributeDefinition> Attributes
@@ -15,20 +15,16 @@ namespace BlueprintLib
 			get;
 			private set;
 		}
-		public string Namespace { get; private set; }
 		public string Name { get; private set; }
+		public string TypeName { get; private set; }
 
-		public List<PropertyDefinition> Properties
-		{
-			get;
-			private set;
-		}
+		
 
-		public ClassDefinition(string Namespace,  string Name) : base()
+		public PropertyDefinition(string Name,string TypeName) : base()
 		{
 			this.Attributes = new List<AttributeDefinition>();
-			this.Properties = new List<PropertyDefinition>();
-			this.Namespace = Namespace; this.Name = Name;
+			this.Name=Name;
+			this.TypeName = TypeName;
 		}
 		public override string ToString()
 		{

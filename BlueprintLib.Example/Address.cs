@@ -2,14 +2,18 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Xml.Serialization;
 using BlueprintLib;
 using BlueprintLib.Attributes;
 
 namespace BlueprintLib.Example
 {
-    [ClassBlueprint( @"Table.bp"), ClassBlueprint("test1.bp")]
-	public class Address 
+    [ClassBlueprint( @"TableModel.bp"), ClassBlueprint("test1.bp")]
+	public partial class Address 
 	{
+		[XmlIgnore]
+		public byte ShouldIgnore { get; set; }
+
 		//[Column,PrimaryKey]
 		public byte AddressID { get; set; }
 
