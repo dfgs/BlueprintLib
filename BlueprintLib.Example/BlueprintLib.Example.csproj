@@ -12,6 +12,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<AdditionalFiles Include="Blueprints\TableAttribute.sbp" />
 		<AdditionalFiles Include="Blueprints\TableModel.bp" />
 	</ItemGroup>
 

@@ -8,7 +8,7 @@ using BlueprintLib.Attributes;
 
 namespace BlueprintLib.Example
 {
-    [ClassBlueprint( @"TableModel.bp"), ClassBlueprint("test1.bp")]
+    [Table, ClassBlueprint( @"TableModel.bp"), ClassBlueprint("test1.bp")]
 	public partial class Address 
 	{
 		[XmlIgnore]

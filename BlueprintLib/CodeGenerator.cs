@@ -59,8 +59,8 @@ namespace BlueprintLib
 			// register static files
 			context.RegisterPostInitializationOutput(incrementalGeneratorPostInitializationContext => incrementalGeneratorPostInitializationContext.AddSource($"Attributes/{ClassBlueprintAttributeName}.g.cs", SourceText.From(ClassBlueprintAttributeSourceCode, Encoding.UTF8)));
 
-			
-			blueprintFileProvider = context.AdditionalTextsProvider.Where(additionalText => Path.GetExtension(additionalText.Path) == ".bp")
+		
+			blueprintFileProvider = context.AdditionalTextsProvider.Where(additionalText => (Path.GetExtension(additionalText.Path) == ".bp") || (Path.GetExtension(additionalText.Path) == ".sbp"))
 			.Select((additionalText, cancellationToken) =>
 				new Blueprint(Path.GetFileName(additionalText.Path), additionalText.GetText(cancellationToken)?.ToString()??"// No content")
 			);
@@ -138,7 +138,9 @@ namespace BlueprintLib
 			ClassDefinition classDefinition;
 
 
-			projectDefinition = new ProjectDefinition();
+			projectDefinition = new ProjectDefinition(Compilation.AssemblyName??"noname");
+			
+
 			foreach (TypeDeclarationSyntax typeDeclaration in TypeDeclarations)
 			{
 				// On récupère le modèle sémantique pour pouvoir manipuler les méta données et le contenu de nos objets 
@@ -175,10 +177,18 @@ namespace BlueprintLib
 
 			scriptObject.Add("project", ProjectDefinition);
 
-
 			templateContext.PushGlobal(scriptObject);
 
+			// generate source files from static templates
+			foreach (Blueprint staticBlueprint in Blueprints.Where(item => Path.GetExtension(item.FileName) == ".sbp"))
+			{
+				template = Scriban.Template.ParseLiquid(staticBlueprint.Content);
+				source = template.Render(templateContext);
 
+				SourceProductionContext.AddSource($"{Path.GetFileNameWithoutExtension(staticBlueprint.FileName)}.g.cs", SourceText.From(source, Encoding.UTF8));
+			}
+
+			// generate source files from project definition
 			foreach (ClassDefinition classDefinition in ProjectDefinition.Classes)
 			{
 				foreach(AttributeDefinition attributeDefinition in classDefinition.Attributes.Where(item=>item.Name== ClassBlueprintFullAttributeName))
@@ -186,7 +196,6 @@ namespace BlueprintLib
 					foreach (AttributeParameterDefinition attributeParameterDefinition in attributeDefinition.Parameters.Where(item => item.Name == "Name"))
 					{
 						blueprint = Blueprints.FirstOrDefault(item => item.FileName == attributeParameterDefinition.Value);
-
 
 						if (blueprint == null) source = $"#warning Blueprint {attributeParameterDefinition.Value} was not found, please check if compilation action is set to additional files";
 						else
