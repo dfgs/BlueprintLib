@@ -5,6 +5,7 @@ using System.ComponentModel;
 
 namespace {{class.namespace}}
 {
+
     public partial class {{class.name}}Model : INotifyPropertyChanged
 	{
 		public event PropertyChangedEventHandler PropertyChanged;

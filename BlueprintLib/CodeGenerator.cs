@@ -167,6 +167,18 @@ namespace BlueprintLib
 			ScriptObject scriptObject;
 
 
+			templateContext = new TemplateContext();
+
+			scriptObject = new ScriptObject();
+			// Declare a functions
+			scriptObject.Import("contains", new Func<IEnumerable<AttributeDefinition>, string, bool>((attributes, name) => attributes.Any(item => item.Name == name)));
+
+			scriptObject.Add("project", ProjectDefinition);
+
+
+			templateContext.PushGlobal(scriptObject);
+
+
 			foreach (ClassDefinition classDefinition in ProjectDefinition.Classes)
 			{
 				foreach(AttributeDefinition attributeDefinition in classDefinition.Attributes.Where(item=>item.Name== ClassBlueprintFullAttributeName))
@@ -179,15 +191,8 @@ namespace BlueprintLib
 						if (blueprint == null) source = $"#warning Blueprint {attributeParameterDefinition.Value} was not found, please check if compilation action is set to additional files";
 						else
 						{
-							scriptObject = new ScriptObject();
+							scriptObject.Remove("class");
 							scriptObject.Add("class", classDefinition);
-							// Declare a function `myfunc` returning the string `Yes`
-							scriptObject.Import("contains", new Func<IEnumerable<AttributeDefinition> ,string, bool>((attributes,name) => attributes.Any(item=>item.Name==name) ));
-
-							templateContext = new TemplateContext();
-							templateContext.PushGlobal(scriptObject);
-
-
 
 							template = Scriban.Template.ParseLiquid(blueprint.Content);
 							source = template.Render(templateContext);
