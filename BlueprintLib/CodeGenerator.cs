@@ -62,7 +62,6 @@ namespace BlueprintLib
 				new Blueprint(Path.GetFileName(additionalText.Path), additionalText.GetText(cancellationToken)?.ToString()??"// No content")
 			);
 
-
 			#pragma warning disable CS8619 // La nullabilité des types référence dans la valeur ne correspond pas au type cible.
 			typeDeclarationSyntaxProvider = context.SyntaxProvider.CreateSyntaxProvider
 			(
@@ -72,21 +71,20 @@ namespace BlueprintLib
 			.Where(typeDeclarationSyntax => typeDeclarationSyntax != null);
 			#pragma warning restore CS8619 // La nullabilité des types référence dans la valeur ne correspond pas au type cible.
 
-
-			IncrementalValueProvider<SourceContext> tempProvider = context.CompilationProvider
+			IncrementalValueProvider<ProjectDefinition> projectDefinitionProvider =
+				context.CompilationProvider
 				.Combine(typeDeclarationSyntaxProvider.Collect())
-				.Select((combined,cancelationToken)=> new SourceContext(combined.Left, combined.Right));
+				.Select((combined, cancelationToken) => GenerateProjectDefinition(combined.Left, combined.Right));
 
-			IncrementalValueProvider<SourceContext> sourceContextProvider = 
-				tempProvider.Combine(blueprintFileProvider.Collect())
-				.Select((combined,cancellationToken)=> new SourceContext(combined.Left.Compilation, combined.Left.TypeDeclarations,combined.Right));
-
-
+			IncrementalValueProvider<(ProjectDefinition ProjectDefinition, ImmutableArray<Blueprint> Blueprints)> sourceContextProvider =
+				projectDefinitionProvider.
+				Combine(blueprintFileProvider.Collect())
+				.Select((combined, cancellationToken) => (combined.Left, combined.Right));
 
 			context.RegisterSourceOutput
 			(
 				sourceContextProvider,
-				(sourceProductionContext, sourceContext) => GenerateDynamicSources(context, sourceProductionContext, sourceContext)
+				(sourceProductionContext, combined) => GenerateDynamicSources(sourceProductionContext, combined.ProjectDefinition, combined.Blueprints)
 			);
 
 		}
@@ -127,7 +125,7 @@ namespace BlueprintLib
 			}
 		}
 
-		private static ProjectDefinition GenerateProjectDefinition(IncrementalGeneratorInitializationContext Context, SourceProductionContext SourceProductionContext,  SourceContext SourceContext)
+		private static ProjectDefinition GenerateProjectDefinition(Compilation Compilation, ImmutableArray<TypeDeclarationSyntax> TypeDeclarations )
 		{
 			INamedTypeSymbol? typeSymbol;
 			string nameSpace;
@@ -138,10 +136,10 @@ namespace BlueprintLib
 
 
 			projectDefinition = new ProjectDefinition();
-			foreach (TypeDeclarationSyntax typeDeclaration in SourceContext.TypeDeclarations)
+			foreach (TypeDeclarationSyntax typeDeclaration in TypeDeclarations)
 			{
 				// On récupère le modèle sémantique pour pouvoir manipuler les méta données et le contenu de nos objets 
-				typeSymbol = typeDeclaration.GetTypeSymbol<INamedTypeSymbol>(SourceContext.Compilation);
+				typeSymbol = typeDeclaration.GetTypeSymbol<INamedTypeSymbol>(Compilation);
 				if (typeSymbol == null) continue;
 
 				// On récupère le namespace, le nom du noeud courant et on créé le nom du futur DTO
@@ -157,24 +155,22 @@ namespace BlueprintLib
 			return projectDefinition;
 		}
 
-		private void GenerateDynamicSources(IncrementalGeneratorInitializationContext Context, SourceProductionContext SourceProductionContext, SourceContext SourceContext)
+		private void GenerateDynamicSources(SourceProductionContext SourceProductionContext,ProjectDefinition ProjectDefinition, ImmutableArray<Blueprint> Blueprints)
 		{
 			Blueprint? blueprint;
-			ProjectDefinition projectDefinition;
 			string source;
 			Scriban.Template template;
 			TemplateContext templateContext;
 			ScriptObject scriptObject;
 
-			projectDefinition =GenerateProjectDefinition(Context, SourceProductionContext, SourceContext );
 
-			foreach (ClassDefinition classDefinition in projectDefinition.Classes)
+			foreach (ClassDefinition classDefinition in ProjectDefinition.Classes)
 			{
 				foreach(AttributeDefinition attributeDefinition in classDefinition.Attributes.Where(item=>item.Name== "BlueprintLib.Attributes.ClassBlueprintAttribute"))
 				{
 					foreach (AttributeParameterDefinition attributeParameterDefinition in attributeDefinition.Parameters.Where(item => item.Name == "Name"))
 					{
-						blueprint = SourceContext.Blueprints.FirstOrDefault(item => item.FileName == attributeParameterDefinition.Value);
+						blueprint = Blueprints.FirstOrDefault(item => item.FileName == attributeParameterDefinition.Value);
 
 
 						if (blueprint == null) source = $"#warning Blueprint {attributeParameterDefinition.Value} was not found, please check if compilation action is set to additional files";
