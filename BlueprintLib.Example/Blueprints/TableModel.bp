@@ -33,137 +33,22 @@ namespace {{class.namespace}}
 		{%- endfor %}
 		
 
-		/*
-		public {{class.name}}Model(TestDatabaseModel DatabaseModel, {{class.name}} DataSource)
+		
+		public {{class.name}}Model({{class.name}} DataSource)
 		{
-			this.databaseModel=DatabaseModel;
 			this.dataSource=DataSource;
-			
-			this.databaseModel.PersonnTableChanging += OnPersonnTableChanging;
-			
-			this.databaseModel.PersonnTableChanged += OnPersonnTableChanged;
-			
-			this.databaseModel.PersonnRowChanging += OnPersonnRowChanging;
-			
-			this.databaseModel.PersonnRowChanged += OnPersonnRowChanged;
 		}
 		
 		public bool IsModelOf({{class.name}} Item)
 		{
 			return (Item==dataSource);
 		}
-
 		
-		private void OnPersonnRowChanging(Personn Item,string PropertyName, object OldValue, object NewValue)
-		{
-			
-			// Handle event for relation DeliveredPeople
-			{
-				if ((PropertyName == "Delivery{{name}}ID") && ValueType.Equals(OldValue, dataSource.{{name}}ID) && !ValueType.Equals(NewValue,OldValue) && (DeliveredPeopleChanged!=null)  )
-				{		
-					int index;
-					index=GetDeliveredPeople().FirstIndexMatch(model => model.IsModelOf(Item));
-					DeliveredPeopleChanged(Item, TableChangedActions.Remove, index);
-				}
-			}
-			// Handle event for relation BilledPeople
-			{
-				if ((PropertyName == "Billing{{name}}ID") && ValueType.Equals(OldValue, dataSource.{{name}}ID) && !ValueType.Equals(NewValue,OldValue) && (BilledPeopleChanged!=null)  )
-				{		
-					int index;
-					index=GetBilledPeople().FirstIndexMatch(model => model.IsModelOf(Item));
-					BilledPeopleChanged(Item, TableChangedActions.Remove, index);
-				}
-			}
-		}
-		private void OnPersonnRowChanged(Personn Item,string PropertyName, object OldValue, object NewValue)
-		{
-			
-			// Handle event for relation DeliveredPeople
-			{
-				if ((PropertyName == "Delivery{{name}}ID") && ValueType.Equals(NewValue, dataSource.{{name}}ID) && !ValueType.Equals(NewValue,OldValue) && (DeliveredPeopleChanged!=null)  )
-				{		
-					int index;
-					index=GetDeliveredPeople().FirstIndexMatch(model => model.IsModelOf(Item));
-					DeliveredPeopleChanged(Item, TableChangedActions.Add, index);
-				}
-			}
-			// Handle event for relation BilledPeople
-			{
-				if ((PropertyName == "Billing{{name}}ID") && ValueType.Equals(NewValue, dataSource.{{name}}ID) && !ValueType.Equals(NewValue,OldValue) && (BilledPeopleChanged!=null)  )
-				{		
-					int index;
-					index=GetBilledPeople().FirstIndexMatch(model => model.IsModelOf(Item));
-					BilledPeopleChanged(Item, TableChangedActions.Add, index);
-				}
-			}
-		}
-		private void OnPersonnTableChanging(Personn Item,TableChangedActions Action, int Index)
-		{
-			
-			// Handle event for relation DeliveredPeople
-			{
-				if ((Item.Delivery{{name}}ID == dataSource.{{name}}ID) && (DeliveredPeopleChanged!=null) && (Action==TableChangedActions.Remove) )
-				{		
-					int index;
-					index=GetDeliveredPeople().FirstIndexMatch(model => model.IsModelOf(Item));
-					DeliveredPeopleChanged(Item, TableChangedActions.Remove, index);
-				}
-			}
-			// Handle event for relation BilledPeople
-			{
-				if ((Item.Billing{{name}}ID == dataSource.{{name}}ID) && (BilledPeopleChanged!=null) && (Action==TableChangedActions.Remove) )
-				{		
-					int index;
-					index=GetBilledPeople().FirstIndexMatch(model => model.IsModelOf(Item));
-					BilledPeopleChanged(Item, TableChangedActions.Remove, index);
-				}
-			}
-		}
-		private void OnPersonnTableChanged(Personn Item,TableChangedActions Action, int Index)
-		{
-			
-			// Handle event for relation DeliveredPeople
-			{
-				if ((Item.Delivery{{name}}ID == dataSource.{{name}}ID) && (DeliveredPeopleChanged!=null) && (Action==TableChangedActions.Add) )
-				{		
-					int index;
-					index=GetDeliveredPeople().FirstIndexMatch(model => model.IsModelOf(Item));
-					DeliveredPeopleChanged(Item, TableChangedActions.Add, index);
-				}
-			}
-			// Handle event for relation BilledPeople
-			{
-				if ((Item.Billing{{name}}ID == dataSource.{{name}}ID) && (BilledPeopleChanged!=null) && (Action==TableChangedActions.Add) )
-				{		
-					int index;
-					index=GetBilledPeople().FirstIndexMatch(model => model.IsModelOf(Item));
-					BilledPeopleChanged(Item, TableChangedActions.Add, index);
-				}
-			}
-		}
-		*/
 		protected virtual void OnPropertyChanged(string PropertyName)
 		{
 			if( PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(PropertyName));
 		}
-		/*
-		public void Delete()
-		{
-			this.databaseModel.Remove{{name}}(this);
-		}
 		
-		// Get foreign items from relation DataModelLib.SourceGenerator.ModelSourceGenerator
-		public IEnumerable<PersonnModel> GetDeliveredPeople()
-		{
-			return databaseModel.GetPersonnTable(item=>item.Delivery{{name}}ID == {{name}}ID);
-		}
-		// Get foreign items from relation DataModelLib.SourceGenerator.ModelSourceGenerator
-		public IEnumerable<PersonnModel> GetBilledPeople()
-		{
-			return databaseModel.GetPersonnTable(item=>item.Billing{{name}}ID == {{name}}ID);
-		}
-		*/
 
 		public override string ToString()
 		{
