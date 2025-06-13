@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 
 namespace BlueprintLib
@@ -28,7 +29,7 @@ namespace BlueprintLib
 		}
 		public override string ToString()
 		{
-			return Name;
+			return $$"""[{{string.Join(",", Attributes)}}] {{Name}}""";
 		}
 
 

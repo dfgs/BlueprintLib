@@ -9,7 +9,7 @@ using BlueprintLib.Example.Attributes;
 
 namespace BlueprintLib.Example
 {
-    [Table, ClassBlueprint( @"TableModel.bp"), ClassBlueprint("test1.bp")]
+    [ ClassBlueprint( @"TableModel.bp"), ClassBlueprint("test1.bp"), Table("ADDRESS")]
 	public partial class Address 
 	{
 		[XmlIgnore]
@@ -18,7 +18,7 @@ namespace BlueprintLib.Example
 		//[Column,PrimaryKey]
 		public byte AddressID { get; set; }
 
-		//[Column]
+		[Column("Test")]
 		public string Street { get; set; }
 		//[Column]
 		public byte? Number { get; set; }

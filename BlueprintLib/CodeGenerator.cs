@@ -10,6 +10,7 @@ using System.Collections.Immutable;
 using System.Data.SqlTypes;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Xml.Linq;
@@ -101,6 +102,7 @@ namespace BlueprintLib
 			{
 				if (attributeData.AttributeClass == null) continue;
 				attributeDefinition = new AttributeDefinition(attributeData.AttributeClass.ToString());
+
 				if (attributeData.AttributeConstructor != null)
 				{
 					for (int t = 0; t < attributeData.AttributeConstructor.Parameters.Length; t++)
@@ -112,6 +114,15 @@ namespace BlueprintLib
 						attributeDefinition.Parameters.Add(attributeParameterDefinition);
 					}
 				}
+				foreach (KeyValuePair<string, TypedConstant> namedArgument in attributeData.NamedArguments)
+				{
+					string parameterName = namedArgument.Key;
+					string? parameterValue = namedArgument.Value.Value?.ToString();
+
+					attributeParameterDefinition = new AttributeParameterDefinition(parameterName, parameterValue);
+					attributeDefinition.Parameters.Add(attributeParameterDefinition);
+				}
+
 				yield return attributeDefinition;
 			}
 		}
@@ -160,11 +171,31 @@ namespace BlueprintLib
 			return projectDefinition;
 		}
 
+		private static string GenerateSourceContent(string TemplateContent, TemplateContext TemplateContext)
+		{
+			string source;
+
+			Template template = Scriban.Template.ParseLiquid(TemplateContent);
+			if (template.HasErrors) source = $"/* \r\nErrors found in blueprint:\r\n{template.Messages.ToString()}\r\n*/";
+			else
+			{
+				try
+				{
+					source = template.Render(TemplateContext);
+				}
+				catch (Exception e)
+				{
+					source = $"/* \r\nErrors found in blueprint:\r\n{e.Message}\r\n*/";
+				}
+
+			}
+
+			return source;
+		}
 		private void GenerateDynamicSources(SourceProductionContext SourceProductionContext,ProjectDefinition ProjectDefinition, ImmutableArray<Blueprint> Blueprints)
 		{
 			Blueprint? blueprint;
 			string source;
-			Scriban.Template template;
 			TemplateContext templateContext;
 			ScriptObject scriptObject;
 
@@ -173,7 +204,8 @@ namespace BlueprintLib
 
 			scriptObject = new ScriptObject();
 			// Declare a functions
-			scriptObject.Import("contains", new Func<IEnumerable<AttributeDefinition>, string, bool>((attributes, name) => attributes.Any(item => item.Name == name)));
+			scriptObject.Import("find", new Func<IEnumerable<AttributeDefinition>, string, AttributeDefinition>((attributes, name) => attributes.FirstOrDefault(item => (item.Name == name) || (item.Name.Split('.').Last() == name))));
+			scriptObject.Import("contains", new Func<IEnumerable<AttributeDefinition>, string, bool>((attributes, name) => attributes.Any(item => (item.Name == name) || (item.Name.Split('.').Last()==name) )));
 
 			scriptObject.Add("project", ProjectDefinition);
 
@@ -182,16 +214,14 @@ namespace BlueprintLib
 			// generate source files from static templates
 			foreach (Blueprint staticBlueprint in Blueprints.Where(item => Path.GetExtension(item.FileName) == ".sbp"))
 			{
-				template = Scriban.Template.ParseLiquid(staticBlueprint.Content);
-				source = template.Render(templateContext);
-
+				source = GenerateSourceContent(staticBlueprint.Content, templateContext);
 				SourceProductionContext.AddSource($"{Path.GetFileNameWithoutExtension(staticBlueprint.FileName)}.g.cs", SourceText.From(source, Encoding.UTF8));
 			}
 
 			// generate source files from project definition
 			foreach (ClassDefinition classDefinition in ProjectDefinition.Classes)
 			{
-				foreach(AttributeDefinition attributeDefinition in classDefinition.Attributes.Where(item=>item.Name== ClassBlueprintFullAttributeName))
+				foreach(AttributeDefinition attributeDefinition in classDefinition.Attributes.Where(item=>item.Name == ClassBlueprintFullAttributeName))
 				{
 					foreach (AttributeParameterDefinition attributeParameterDefinition in attributeDefinition.Parameters.Where(item => item.Name == "Name"))
 					{
@@ -203,8 +233,7 @@ namespace BlueprintLib
 							scriptObject.Remove("class");
 							scriptObject.Add("class", classDefinition);
 
-							template = Scriban.Template.ParseLiquid(blueprint.Content);
-							source = template.Render(templateContext);
+							source = GenerateSourceContent(blueprint.Content, templateContext);
 						}
 					
 						SourceProductionContext.AddSource($"{classDefinition.Name}.{Path.GetFileNameWithoutExtension(attributeParameterDefinition.Value)}.g.cs", SourceText.From(source, Encoding.UTF8));

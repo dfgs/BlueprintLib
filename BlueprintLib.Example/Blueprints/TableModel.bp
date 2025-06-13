@@ -5,9 +5,18 @@ using System.ComponentModel;
 
 namespace {{class.namespace}}
 {
-
+	// class definition
+	/*
+	{{class}}
+	*/
+	{%- assign table_attribute = class.attributes | find "Table" %}
+	 
+	{%- if table_attribute %}
+    public partial class Address{{table_attribute.parameters[0]}}Model : INotifyPropertyChanged
+	{%- else %}
     public partial class {{class.name}}Model : INotifyPropertyChanged
-	{
+	{%- endif %}
+	{ 
 		public event PropertyChangedEventHandler PropertyChanged;
 		
 		private {{class.name}} dataSource

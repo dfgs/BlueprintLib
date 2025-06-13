@@ -32,7 +32,7 @@ namespace BlueprintLib
 		}
 		public override string ToString()
 		{
-			return Name;
+			return $$"""[{{string.Join(",", Attributes)}}]{{"\r\n"}}{{Name}}{{"\r\n"}}{{{"\r\n\t"}}{{string.Join("\r\n	",Properties)}}{{"\r\n"}}}""" ;
 		}
 
 

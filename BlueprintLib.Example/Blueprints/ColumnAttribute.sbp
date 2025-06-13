@@ -6,8 +6,8 @@ using System.ComponentModel;
 namespace {{project.assembly_name}}.Attributes
 {
 
-	[AttributeUsage(AttributeTargets.Class)]
-    public class TableAttribute : Attribute
+	[AttributeUsage(AttributeTargets.Property)]
+    public class ColumnAttribute : Attribute
 	{
 		#nullable enable
 		public string? Name
@@ -17,10 +17,10 @@ namespace {{project.assembly_name}}.Attributes
 		}
 		#nullable disable
 
-		/*public TableAttribute()
+		/*public ColumnAttribute()
 		{
 		}*/
-		public TableAttribute(string Name)
+		public ColumnAttribute(string Name)
 		{
 			this.Name=Name;
 		}
