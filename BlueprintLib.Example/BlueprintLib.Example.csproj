@@ -12,8 +12,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<AdditionalFiles Include="Blueprints\ColumnAttribute.sbp" />
-		<AdditionalFiles Include="Blueprints\TableAttribute.sbp" />
 		<AdditionalFiles Include="Blueprints\TableModel.bp" />
 	</ItemGroup>
 

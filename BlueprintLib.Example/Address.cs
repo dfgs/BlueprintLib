@@ -5,11 +5,11 @@ using System.Text;
 using System.Xml.Serialization;
 using BlueprintLib;
 using BlueprintLib.Attributes;
-using BlueprintLib.Example.Attributes;
+
 
 namespace BlueprintLib.Example
 {
-    [ ClassBlueprint( @"TableModel.bp"), ClassBlueprint("test1.bp"), Table("ADDRESS")]
+    [ ClassBlueprint( @"TableModel.bp"), ClassBlueprint("test1.bp"), ]
 	public partial class Address 
 	{
 		[XmlIgnore]
@@ -18,7 +18,7 @@ namespace BlueprintLib.Example
 		//[Column,PrimaryKey]
 		public byte AddressID { get; set; }
 
-		[Column("Test")]
+		//[Column("Test")]
 		public string Street { get; set; }
 		//[Column]
 		public byte? Number { get; set; }

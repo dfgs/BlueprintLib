@@ -61,7 +61,7 @@ namespace BlueprintLib
 			context.RegisterPostInitializationOutput(incrementalGeneratorPostInitializationContext => incrementalGeneratorPostInitializationContext.AddSource($"Attributes/{ClassBlueprintAttributeName}.g.cs", SourceText.From(ClassBlueprintAttributeSourceCode, Encoding.UTF8)));
 
 		
-			blueprintFileProvider = context.AdditionalTextsProvider.Where(additionalText => (Path.GetExtension(additionalText.Path) == ".bp") || (Path.GetExtension(additionalText.Path) == ".sbp"))
+			blueprintFileProvider = context.AdditionalTextsProvider.Where(additionalText => Path.GetExtension(additionalText.Path) == ".bp")
 			.Select((additionalText, cancellationToken) =>
 				new Blueprint(Path.GetFileName(additionalText.Path), additionalText.GetText(cancellationToken)?.ToString()??"// No content")
 			);
@@ -210,13 +210,6 @@ namespace BlueprintLib
 			scriptObject.Add("project", ProjectDefinition);
 
 			templateContext.PushGlobal(scriptObject);
-
-			// generate source files from static templates
-			foreach (Blueprint staticBlueprint in Blueprints.Where(item => Path.GetExtension(item.FileName) == ".sbp"))
-			{
-				source = GenerateSourceContent(staticBlueprint.Content, templateContext);
-				SourceProductionContext.AddSource($"{Path.GetFileNameWithoutExtension(staticBlueprint.FileName)}.g.cs", SourceText.From(source, Encoding.UTF8));
-			}
 
 			// generate source files from project definition
 			foreach (ClassDefinition classDefinition in ProjectDefinition.Classes)
