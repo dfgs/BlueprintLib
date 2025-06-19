@@ -192,6 +192,9 @@ namespace BlueprintLib
 
 			return source;
 		}
+
+		
+
 		private void GenerateDynamicSources(SourceProductionContext SourceProductionContext,ProjectDefinition ProjectDefinition, ImmutableArray<Blueprint> Blueprints)
 		{
 			Blueprint? blueprint;
@@ -204,8 +207,12 @@ namespace BlueprintLib
 
 			scriptObject = new ScriptObject();
 			// Declare a functions
-			scriptObject.Import("find", new Func<IEnumerable<AttributeDefinition>, string, AttributeDefinition>((attributes, name) => attributes.FirstOrDefault(item => (item.Name == name) || (item.Name.Split('.').Last() == name))));
-			scriptObject.Import("contains", new Func<IEnumerable<AttributeDefinition>, string, bool>((attributes, name) => attributes.Any(item => (item.Name == name) || (item.Name.Split('.').Last()==name) )));
+			scriptObject.Import("find", new Func<IEnumerable<AttributeDefinition>, string, AttributeDefinition?>((attributes, name) => attributes.Find(name) ));
+			scriptObject.Import("contains", new Func<IEnumerable<AttributeDefinition>, string, bool>((attributes, name) => attributes.Contains(name) ));
+			scriptObject.Import("class_with_attribute", new Func<IEnumerable<ClassDefinition>, string, IEnumerable<ClassDefinition>>((classes, name) => classes.WithAttribute(name).ToArray()));
+			scriptObject.Import("property_with_attribute", new Func<IEnumerable<PropertyDefinition>, string, IEnumerable<PropertyDefinition>>((properties, name) => properties.WithAttribute(name).ToArray()));
+			scriptObject.Import("first_class_with_attribute", new Func<IEnumerable<ClassDefinition>, string, ClassDefinition>((classes, name) => classes.WithAttribute(name).FirstOrDefault()));
+			scriptObject.Import("first_property_with_attribute", new Func<IEnumerable<PropertyDefinition>, string, PropertyDefinition>((properties, name) => properties.WithAttribute(name).FirstOrDefault()));
 
 			scriptObject.Add("project", ProjectDefinition);
 

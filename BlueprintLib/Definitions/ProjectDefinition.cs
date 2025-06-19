@@ -24,5 +24,11 @@ namespace BlueprintLib.Definitions
 			this.AssemblyName = AssemblyName;
 			Classes = new List<ClassDefinition>();
 		}
+
+		public override string ToString()
+		{
+			return $$"""{{AssemblyName}}{{"\r\n"}}{{{"\r\n\t"}}{{string.Join("\r\n	", Classes)}}{{"\r\n"}}}""";
+		}
+
 	}
 }
