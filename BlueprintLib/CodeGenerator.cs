@@ -175,7 +175,7 @@ namespace BlueprintLib
 		{
 			string source;
 
-			Template template = Scriban.Template.ParseLiquid(TemplateContent);
+			Template template = Scriban.Template.Parse(TemplateContent);
 			if (template.HasErrors) source = $"/* \r\nErrors found in blueprint:\r\n{template.Messages.ToString()}\r\n*/";
 			else
 			{
@@ -207,8 +207,12 @@ namespace BlueprintLib
 
 			scriptObject = new ScriptObject();
 			// Declare a functions
-			scriptObject.Import("find", new Func<IEnumerable<AttributeDefinition>, string, AttributeDefinition?>((attributes, name) => attributes.Find(name) ));
-			scriptObject.Import("contains", new Func<IEnumerable<AttributeDefinition>, string, bool>((attributes, name) => attributes.Contains(name) ));
+			scriptObject.Import("find_attribute", new Func<IEnumerable<AttributeDefinition>, string, AttributeDefinition?>((attributes, name) => attributes.Find(name) ));
+			scriptObject.Import("contains_attribute", new Func<IEnumerable<AttributeDefinition>, string, bool>((attributes, name) => attributes.Contains(name) ));
+
+			scriptObject.Import("find_parameter", new Func<IEnumerable<AttributeParameterDefinition>, string, AttributeParameterDefinition?>((parameters, name) => parameters.Find(name)));
+			scriptObject.Import("contains_parameter", new Func<IEnumerable<AttributeParameterDefinition>, string, bool>((parameters, name) => parameters.Contains(name)));
+
 			scriptObject.Import("class_with_attribute", new Func<IEnumerable<ClassDefinition>, string, IEnumerable<ClassDefinition>>((classes, name) => classes.WithAttribute(name).ToArray()));
 			scriptObject.Import("property_with_attribute", new Func<IEnumerable<PropertyDefinition>, string, IEnumerable<PropertyDefinition>>((properties, name) => properties.WithAttribute(name).ToArray()));
 			scriptObject.Import("first_class_with_attribute", new Func<IEnumerable<ClassDefinition>, string, ClassDefinition>((classes, name) => classes.WithAttribute(name).FirstOrDefault()));
