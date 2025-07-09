@@ -63,7 +63,7 @@ namespace BlueprintLib
 		
 			blueprintFileProvider = context.AdditionalTextsProvider.Where(additionalText => Path.GetExtension(additionalText.Path) == ".bp")
 			.Select((additionalText, cancellationToken) =>
-				new Blueprint(Path.GetFileName(additionalText.Path), additionalText.GetText(cancellationToken)?.ToString()??"// No content")
+				new Blueprint(Path.GetFileNameWithoutExtension(additionalText.Path), additionalText.GetText(cancellationToken)?.ToString()??"// No content")
 			);
 
 			#pragma warning disable CS8619 // La nullabilité des types référence dans la valeur ne correspond pas au type cible.
@@ -197,7 +197,7 @@ namespace BlueprintLib
 
 		private void GenerateDynamicSources(SourceProductionContext SourceProductionContext,ProjectDefinition ProjectDefinition, ImmutableArray<Blueprint> Blueprints)
 		{
-			Blueprint? blueprint;
+			IEnumerable<Blueprint> blueprints;
 			string source;
 			TemplateContext templateContext;
 			ScriptObject scriptObject;
@@ -229,18 +229,33 @@ namespace BlueprintLib
 				{
 					foreach (AttributeParameterDefinition attributeParameterDefinition in attributeDefinition.Parameters.Where(item => item.Name == "Name"))
 					{
-						blueprint = Blueprints.FirstOrDefault(item => item.FileName == attributeParameterDefinition.Value);
-
-						if (blueprint == null) source = $"#warning Blueprint {attributeParameterDefinition.Value} was not found, please check if compilation action is set to additional files";
+						if (attributeParameterDefinition.Value == null) continue;
+						if (attributeParameterDefinition.Value.EndsWith("*"))
+						{
+							string maskedName = attributeParameterDefinition.Value.Trim('*');
+							blueprints = Blueprints.Where(item => item.FileName.StartsWith(maskedName));
+						}
 						else
 						{
-							scriptObject.Remove("class");
-							scriptObject.Add("class", classDefinition);
-
-							source = GenerateSourceContent(blueprint.Content, templateContext);
+							blueprints = Blueprints.Where(item => item.FileName == attributeParameterDefinition.Value);
 						}
-					
-						SourceProductionContext.AddSource($"{classDefinition.Name}.{Path.GetFileNameWithoutExtension(attributeParameterDefinition.Value)}.g.cs", SourceText.From(source, Encoding.UTF8));
+
+						if ((blueprints!=null) && (blueprints.Any()))
+						{
+							foreach (Blueprint blueprint in blueprints)
+							{
+								scriptObject.Remove("class");
+								scriptObject.Add("class", classDefinition);
+								source = GenerateSourceContent(blueprint.Content, templateContext);
+
+								SourceProductionContext.AddSource($"{classDefinition.Name}.{blueprint.FileName}.g.cs", SourceText.From(source, Encoding.UTF8));
+							}
+						}
+						else
+						{
+							source = $"#warning Blueprint {attributeParameterDefinition.Value} was not found, please check if compilation action is set to additional files";
+							SourceProductionContext.AddSource($"{classDefinition.Name}.{Path.GetFileName(attributeParameterDefinition.Value)}.g.cs", SourceText.From(source, Encoding.UTF8));
+						}
 
 					}
 				}

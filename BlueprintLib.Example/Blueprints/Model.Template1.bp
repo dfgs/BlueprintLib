@@ -10,13 +10,9 @@ namespace {{class.namespace}}
 	/*
 	{{class}}
 	*/
-	{%- assign table_attribute = class.attributes | find "Table" %}
-	 
-	{%- if table_attribute %}
-    public partial class Address{{table_attribute.parameters[0]}}Model : INotifyPropertyChanged
-	{%- else %}
+
+	
     public partial class {{class.name}}Model : INotifyPropertyChanged
-	{%- endif %}
 	{ 
 		public event PropertyChangedEventHandler PropertyChanged;
 		
@@ -27,8 +23,8 @@ namespace {{class.namespace}}
 		}
 
 		
-		{%- for property in class.properties %}
-		{%- unless property.attributes | contains "System.Xml.Serialization.XmlIgnoreAttribute" %}
+		{{- for property in class.properties }}
+		{{- if !(property.attributes | contains_attribute "System.Xml.Serialization.XmlIgnoreAttribute") }}
 		public {{property.type_name}} {{property.name}}
 		{
 			get => dataSource.{{property.name}};
@@ -40,8 +36,8 @@ namespace {{class.namespace}}
 				OnPropertyChanged(nameof({{property.name}})); 
 			}
 		}
-		{%- endunless  %}
-		{%- endfor %}
+		{{- end }}
+		{{- end }}
 		
 
 		
@@ -50,17 +46,12 @@ namespace {{class.namespace}}
 			this.dataSource=DataSource;
 		}
 		
-		public bool IsModelOf({{class.name}} Item)
-		{
-			return (Item==dataSource);
-		}
 		
 		protected virtual void OnPropertyChanged(string PropertyName)
 		{
 			if( PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(PropertyName));
 		}
 		
-
 		public override string ToString()
 		{
 			return dataSource.ToString();

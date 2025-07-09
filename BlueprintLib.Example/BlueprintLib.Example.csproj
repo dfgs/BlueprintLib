@@ -12,7 +12,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<AdditionalFiles Include="Blueprints\TableModel.bp" />
+		<AdditionalFiles Include="Blueprints\Model.Template2.bp" />
+		<AdditionalFiles Include="Blueprints\Model.Template1.bp" />
 	</ItemGroup>
 
 </Project>

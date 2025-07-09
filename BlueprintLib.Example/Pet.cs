@@ -7,7 +7,7 @@ using BlueprintLib.Attributes;
 
 namespace BlueprintLib.Example
 {
-	[Blueprint(@"TableModel.bp")]
+	[Blueprint(@"Model.Template1")]
 	public class Pet
 	{
 		public byte PetID { get; set; }

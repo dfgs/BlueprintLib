@@ -9,7 +9,7 @@ using BlueprintLib.Attributes;
 
 namespace BlueprintLib.Example
 {
-    [ Blueprint( @"TableModel.bp"), Blueprint("test1.bp"), ]
+    [ Blueprint( @"Model.Template*"), Blueprint("NotFound"), ]
 	public partial class Address 
 	{
 		[XmlIgnore]
