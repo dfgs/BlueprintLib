@@ -13,11 +13,13 @@ namespace BlueprintLib.Example
 		public byte PetID { get; set; }
 
 		public string Name { get; set; }
-		
+
+
 		public Pet(byte PetID, string Name)
 		{
 			this.PetID = PetID;this.Name = Name;
 		}
+		
 		public override string ToString()
 		{
 			return $"{Name}";

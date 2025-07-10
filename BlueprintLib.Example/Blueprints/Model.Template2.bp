@@ -6,9 +6,9 @@ using System.ComponentModel;
 
 namespace {{class.namespace}}
 {
-	// class definition
+	// project definition
 	/*
-	{{class}}
+	{{project}}
 	*/
 
 	

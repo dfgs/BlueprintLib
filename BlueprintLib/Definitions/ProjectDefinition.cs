@@ -19,15 +19,22 @@ namespace BlueprintLib.Definitions
 			private set;
 		}
 
+		public List<string> References
+		{
+			get;
+			private set;
+		}
+
 		public ProjectDefinition(string AssemblyName)
 		{
 			this.AssemblyName = AssemblyName;
 			Classes = new List<ClassDefinition>();
+			References = new List<string>();
 		}
 
 		public override string ToString()
 		{
-			return $$"""{{AssemblyName}}{{"\r\n"}}{{{"\r\n\t"}}{{string.Join("\r\n	", Classes)}}{{"\r\n"}}}""";
+			return $$"""{{AssemblyName}}{{"\r\n"}}{{{"\r\n\t"}}{{string.Join("\r\n	", Classes)}}{{"\r\n"}}}{{string.Join("\r\n	", References)}}""";
 		}
 
 	}

@@ -10,6 +10,7 @@ using System.Collections.Immutable;
 using System.Data.SqlTypes;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -36,7 +37,7 @@ namespace BlueprintLib
 		namespace {{Namespace}}
 		{
 			[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-			public class {{BlueprintAttributeName}} : Attribute
+			internal class {{BlueprintAttributeName}} : Attribute
 			{
 				public string Name
 				{
@@ -75,10 +76,11 @@ namespace BlueprintLib
 			.Where(typeDeclarationSyntax => typeDeclarationSyntax != null);
 			#pragma warning restore CS8619 // La nullabilité des types référence dans la valeur ne correspond pas au type cible.
 
+			
 			IncrementalValueProvider<ProjectDefinition> projectDefinitionProvider =
 				context.CompilationProvider
-				.Combine(typeDeclarationSyntaxProvider.Collect())
-				.Select((combined, cancelationToken) => GenerateProjectDefinition(combined.Left, combined.Right));
+				.Combine(typeDeclarationSyntaxProvider.Collect().Combine(context.MetadataReferencesProvider.Collect()))
+				.Select((combined, cancelationToken) => GenerateProjectDefinition(combined.Left, combined.Right.Left,combined.Right.Right));
 
 			IncrementalValueProvider<(ProjectDefinition ProjectDefinition, ImmutableArray<Blueprint> Blueprints)> sourceContextProvider =
 				projectDefinitionProvider.
@@ -139,7 +141,7 @@ namespace BlueprintLib
 			}
 		}
 
-		private static ProjectDefinition GenerateProjectDefinition(Compilation Compilation, ImmutableArray<TypeDeclarationSyntax> TypeDeclarations )
+		private static ProjectDefinition GenerateProjectDefinition(Compilation Compilation, ImmutableArray<TypeDeclarationSyntax> TypeDeclarations,ImmutableArray<MetadataReference> MetadataReferences)
 		{
 			INamedTypeSymbol? typeSymbol;
 			string nameSpace;
@@ -147,10 +149,28 @@ namespace BlueprintLib
 
 			ProjectDefinition projectDefinition ;
 			ClassDefinition classDefinition;
-
+			
 
 			projectDefinition = new ProjectDefinition(Compilation.AssemblyName??"noname");
-			
+
+			foreach (MetadataReference reference in MetadataReferences)
+			{
+				//if (reference.Display!=null) projectDefinition.References.Add(reference.Display);
+				if (reference is CompilationReference compilationReference)
+				{
+					
+					projectDefinition.References.Add(compilationReference.Compilation.Assembly.Identity.ToString());
+
+					//projectDefinition.References.Add(assembly?.FullName??"not loaded");
+
+					/*return compilationReference.Compilation.Assembly.Modules
+							  .Select(m => new ModuleInfo(
+												m.Name,
+												compilationReference.Compilation.Assembly.Identity.Version));*/
+				}
+
+			}
+
 
 			foreach (TypeDeclarationSyntax typeDeclaration in TypeDeclarations)
 			{

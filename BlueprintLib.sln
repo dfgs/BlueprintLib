@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueprintLib", "BlueprintLi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueprintLib.Example", "BlueprintLib.Example\BlueprintLib.Example.csproj", "{A36DE5AA-FED2-4CA7-A4F4-0D9A24532E3F}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "BlueprintLib.Example.Shared", "BlueprintLib.Example.Shared\BlueprintLib.Example.Shared.shproj", "{68B6F0DF-8A56-4B28-8B71-130A8AB91E0F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,5 +29,9 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E992CFFA-32F5-4B17-B7B7-06524D0FD61E}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		BlueprintLib.Example.Shared\BlueprintLib.Example.Shared.projitems*{68b6f0df-8a56-4b28-8b71-130a8ab91e0f}*SharedItemsImports = 13
+		BlueprintLib.Example.Shared\BlueprintLib.Example.Shared.projitems*{a36de5aa-fed2-4ca7-a4f4-0d9a24532e3f}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal

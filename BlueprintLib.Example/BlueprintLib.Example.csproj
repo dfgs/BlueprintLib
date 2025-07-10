@@ -16,4 +16,6 @@
 		<AdditionalFiles Include="Blueprints\Model.Template1.bp" />
 	</ItemGroup>
 
+	<Import Project="..\BlueprintLib.Example.Shared\BlueprintLib.Example.Shared.projitems" Label="Shared" />
+
 </Project>
