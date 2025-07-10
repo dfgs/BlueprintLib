@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<ClassDefinition xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Namespace="BlueprintLib.Example" Name="Address">
+  <Attributes>
+    <AttributeDefinition Name="BlueprintLib.Attributes.BlueprintAttribute">
+      <Parameters>
+        <AttributeParameterDefinition Name="Name" Value="Model.Template*" />
+      </Parameters>
+    </AttributeDefinition>
+    <AttributeDefinition Name="BlueprintLib.Attributes.BlueprintAttribute">
+      <Parameters>
+        <AttributeParameterDefinition Name="Name" Value="NotFound" />
+      </Parameters>
+    </AttributeDefinition>
+  </Attributes>
+  <Properties>
+    <PropertyDefinition Name="ShouldIgnore" TypeName="byte">
+      <Attributes>
+        <AttributeDefinition Name="System.Xml.Serialization.XmlIgnoreAttribute">
+          <Parameters />
+        </AttributeDefinition>
+      </Attributes>
+    </PropertyDefinition>
+    <PropertyDefinition Name="AddressID" TypeName="byte">
+      <Attributes />
+    </PropertyDefinition>
+    <PropertyDefinition Name="Street" TypeName="string">
+      <Attributes />
+    </PropertyDefinition>
+    <PropertyDefinition Name="Number" TypeName="byte?">
+      <Attributes />
+    </PropertyDefinition>
+  </Properties>
+</ClassDefinition>

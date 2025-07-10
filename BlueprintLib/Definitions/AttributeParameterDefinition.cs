@@ -3,15 +3,23 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace BlueprintLib
 {
+	[Serializable]
 	public class AttributeParameterDefinition : ObjectDefinition
 	{
 
-		public string Name { get; private set; }
-		public string? Value { get; private set; }
+		[XmlAttribute]
+		public string Name { get;  set; }
+		[XmlAttribute]
+		public string? Value { get;  set; }
 
+		public AttributeParameterDefinition() : base()
+		{
+			this.Name = "Undefined";
+		}
 
 		public AttributeParameterDefinition( string Name, string? Value) : base()
 		{

@@ -9,8 +9,8 @@
     <Import_RootNamespace>BlueprintLib.Example.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Address.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Personn.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Pet.cs" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)Pet.dto" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)Personn.dto" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)Address.dto" />
   </ItemGroup>
 </Project>

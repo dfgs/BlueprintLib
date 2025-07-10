@@ -15,12 +15,9 @@ namespace BlueprintLib.Example
 		[XmlIgnore]
 		public byte ShouldIgnore { get; set; }
 
-		//[Column,PrimaryKey]
 		public byte AddressID { get; set; }
 
-		//[Column("Test")]
 		public string Street { get; set; }
-		//[Column]
 		public byte? Number { get; set; }
 
 		public Address(byte AddressID, string Street)
