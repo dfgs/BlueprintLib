@@ -7,13 +7,10 @@ using BlueprintLib.Attributes;
 
 namespace BlueprintLib.Example
 {
-	[Blueprint(@"Model.Template1")]
-	public class Pet
+	[DTO("Pet"), Blueprint(@"Model.Template1"), Blueprint(@"DTO"),]
+	public partial class Pet
 	{
-		public byte PetID { get; set; }
-
-		public string Name { get; set; }
-
+	
 
 		public Pet(byte PetID, string Name)
 		{

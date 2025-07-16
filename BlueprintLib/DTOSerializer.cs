@@ -22,9 +22,16 @@ namespace BlueprintLib
 			XmlSerializer serializer = new XmlSerializer(typeof(DTO));
 			DTO dto;
 
-			using (FileStream stream = new FileStream(Path, FileMode.Open))
+			try
 			{
-				dto=(DTO)serializer.Deserialize(stream);
+				using (FileStream stream = new FileStream(Path, FileMode.Open))
+				{
+					dto = (DTO)serializer.Deserialize(stream);
+				}
+			}
+			catch (Exception ex)
+			{
+				throw new Exception($"Failed to load DTO file {System.IO.Path.GetFileNameWithoutExtension(Path)}, {ex.Message}", ex);
 			}
 			dto.Name = System.IO.Path.GetFileNameWithoutExtension(Path);
 			

@@ -1,17 +1,6 @@
 <?xml version="1.0"?>
-<ClassDefinition xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Namespace="BlueprintLib.Example" Name="Address">
-  <Attributes>
-    <AttributeDefinition Name="BlueprintLib.Attributes.BlueprintAttribute">
-      <Parameters>
-        <AttributeParameterDefinition Name="Name" Value="Model.Template*" />
-      </Parameters>
-    </AttributeDefinition>
-    <AttributeDefinition Name="BlueprintLib.Attributes.BlueprintAttribute">
-      <Parameters>
-        <AttributeParameterDefinition Name="Name" Value="NotFound" />
-      </Parameters>
-    </AttributeDefinition>
-  </Attributes>
+<DTO xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Attributes/>
   <Properties>
     <PropertyDefinition Name="ShouldIgnore" TypeName="byte">
       <Attributes>
@@ -30,4 +19,4 @@
       <Attributes />
     </PropertyDefinition>
   </Properties>
-</ClassDefinition>
+</DTO>

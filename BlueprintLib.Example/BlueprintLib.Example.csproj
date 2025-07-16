@@ -7,11 +7,16 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="Blueprints\DTO.bp" />
+  </ItemGroup>
+
 	<ItemGroup>
 		<ProjectReference Include="..\BlueprintLib\BlueprintLib.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<AdditionalFiles Include="Blueprints\DTO.bp" />
 		<AdditionalFiles Include="Blueprints\Model.Template2.bp" />
 		<AdditionalFiles Include="Blueprints\Model.Template1.bp" />
 	</ItemGroup>

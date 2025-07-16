@@ -1,12 +1,6 @@
 <?xml version="1.0"?>
-<ClassDefinition xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Namespace="BlueprintLib.Example" Name="Personn">
-  <Attributes>
-    <AttributeDefinition Name="BlueprintLib.Attributes.BlueprintAttribute">
-      <Parameters>
-        <AttributeParameterDefinition Name="Name" Value="Model.Template1" />
-      </Parameters>
-    </AttributeDefinition>
-  </Attributes>
+<DTO xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Attributes/>
   <Properties>
     <PropertyDefinition Name="PersonnID" TypeName="byte">
       <Attributes />
@@ -30,4 +24,4 @@
       <Attributes />
     </PropertyDefinition>
   </Properties>
-</ClassDefinition>
+</DTO>

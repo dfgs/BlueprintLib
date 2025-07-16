@@ -95,7 +95,7 @@ namespace BlueprintLib
 				new Blueprint(Path.GetFileNameWithoutExtension(additionalText.Path), additionalText.GetText(cancellationToken)?.ToString() ?? "// No content")
 			);
 
-			// provide class definition files
+			// provide DTO files
 			dtoFileProvider = context.AdditionalTextsProvider.Where(additionalText => Path.GetExtension(additionalText.Path) == ".dto")
 			.Select((additionalText, cancellationToken) =>
 				DTOSerializer.Deserialize(additionalText.Path)
@@ -206,9 +206,9 @@ namespace BlueprintLib
 				classDefinition.Properties.AddRange(GeneratePropertyDefinitions(typeSymbol));
 
 				// get additional DTO
-				foreach (AttributeDefinition attributeDefinition in classDefinition.Attributes.Where(item => item.Name == DTOFullAttributeName))
+				foreach (AttributeDefinition attributeDefinition in classDefinition.Attributes.Where(item => item.Name == DTOFullAttributeName).ToArray())
 				{
-					foreach (AttributeParameterDefinition attributeParameterDefinition in attributeDefinition.Parameters.Where(item => item.Name == "Name"))
+					foreach (AttributeParameterDefinition attributeParameterDefinition in attributeDefinition.Parameters.Where(item => item.Name == "Name").ToArray())
 					{
 						if (attributeParameterDefinition.Value == null) continue;
 						dto = DTOs.FirstOrDefault(item => item.Name == attributeParameterDefinition.Value);
