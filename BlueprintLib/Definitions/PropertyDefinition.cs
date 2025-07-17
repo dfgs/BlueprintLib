@@ -41,7 +41,8 @@ namespace BlueprintLib
 			return $$"""[{{string.Join(",", Attributes)}}] {{Name}}""";
 		}
 
-
+		
+		
 
 
 

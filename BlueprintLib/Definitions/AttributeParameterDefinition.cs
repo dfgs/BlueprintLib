@@ -14,21 +14,25 @@ namespace BlueprintLib
 		[XmlAttribute]
 		public string Name { get;  set; }
 		[XmlAttribute]
-		public string? Value { get;  set; }
+		public string? Value { get; set; }
+		[XmlAttribute]
+		public bool IsString { get; set; }
 
 		public AttributeParameterDefinition() : base()
 		{
-			this.Name = "Undefined";
+			this.Name = "Undefined";IsString = true;
 		}
 
 		public AttributeParameterDefinition( string Name, string? Value) : base()
 		{
 			this.Name = Name;
 			this.Value = Value;
+			this.IsString = true;
 		}
 		public override string ToString()
 		{
-			return $"{Name} = {Value}";
+			if (IsString) return $"{Name} = \"{Value}\"";
+			else return $"{Name} = {Value}";
 		}
 
 

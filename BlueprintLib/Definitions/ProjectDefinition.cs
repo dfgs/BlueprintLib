@@ -45,5 +45,7 @@ namespace BlueprintLib.Definitions
 			return $$"""{{AssemblyName}}{{"\r\n"}}{{{"\r\n\t"}}{{string.Join("\r\n	", Classes)}}{{"\r\n"}}}{{string.Join("\r\n	", References)}}""";
 		}
 
+		
+
 	}
 }

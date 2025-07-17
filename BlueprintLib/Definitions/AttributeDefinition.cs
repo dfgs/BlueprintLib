@@ -30,7 +30,7 @@ namespace BlueprintLib
 		}
 		public override string ToString()
 		{
-			return $$"""{{Name}}({{string.Join(",",Parameters)}})""";
+			return $$"""{{Name}}({{string.Join(", ",Parameters)}})""";
 		}
 
 
