@@ -19,9 +19,9 @@ namespace BlueprintLib.Definitions
 			return Items.Any(item => item.MatchesName(Name));
 		}
 		
-		public static IEnumerable<IAttributeContainer> WithAttribute(this IEnumerable<IAttributeContainer> ClassDefinitions, string Name)
+		public static IEnumerable<IAttributeContainer> WithAttribute(this IEnumerable<IAttributeContainer> Items, string Name)
 		{
-			return ClassDefinitions.Where(item=>item.Attributes.Contains(Name));
+			return Items.Where(item=>item.Attributes.Contains(Name));
 		}
 		
 
