@@ -259,16 +259,9 @@ namespace BlueprintLib
 
 			scriptObject = new ScriptObject();
 			// Declare a functions
-			scriptObject.Import("find_attribute", new Func<IEnumerable<AttributeDefinition>, string, AttributeDefinition?>((attributes, name) => attributes.Find(name) ));
-			scriptObject.Import("contains_attribute", new Func<IEnumerable<AttributeDefinition>, string, bool>((attributes, name) => attributes.Contains(name) ));
-
-			scriptObject.Import("find_parameter", new Func<IEnumerable<AttributeParameterDefinition>, string, AttributeParameterDefinition?>((parameters, name) => parameters.Find(name)));
-			scriptObject.Import("contains_parameter", new Func<IEnumerable<AttributeParameterDefinition>, string, bool>((parameters, name) => parameters.Contains(name)));
-
-			scriptObject.Import("class_with_attribute", new Func<IEnumerable<ClassDefinition>, string, IEnumerable<ClassDefinition>>((classes, name) => classes.WithAttribute(name).ToArray()));
-			scriptObject.Import("property_with_attribute", new Func<IEnumerable<PropertyDefinition>, string, IEnumerable<PropertyDefinition>>((properties, name) => properties.WithAttribute(name).ToArray()));
-			scriptObject.Import("first_class_with_attribute", new Func<IEnumerable<ClassDefinition>, string, ClassDefinition>((classes, name) => classes.WithAttribute(name).FirstOrDefault()));
-			scriptObject.Import("first_property_with_attribute", new Func<IEnumerable<PropertyDefinition>, string, PropertyDefinition>((properties, name) => properties.WithAttribute(name).FirstOrDefault()));
+			scriptObject.Import("find", new Func<IEnumerable<INamed>, string, INamed?>((items, name) => items.Find(name) ));
+			scriptObject.Import("contains", new Func<IEnumerable<INamed>, string, bool>((items, name) => items.Contains(name) ));
+			scriptObject.Import("with_attribute", new Func<IEnumerable<IAttributeContainer>, string, IEnumerable<IAttributeContainer>>((items, name) => items.WithAttribute(name).ToArray()));
 
 			scriptObject.Add("project", ProjectDefinition);
 

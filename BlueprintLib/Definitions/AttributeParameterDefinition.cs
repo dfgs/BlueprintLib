@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BlueprintLib.Definitions;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Xml.Serialization;
 namespace BlueprintLib
 {
 	[Serializable]
-	public class AttributeParameterDefinition : ObjectDefinition
+	public class AttributeParameterDefinition : ObjectDefinition, INamed
 	{
 
 		[XmlAttribute]

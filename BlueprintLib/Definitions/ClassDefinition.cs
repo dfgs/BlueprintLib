@@ -9,9 +9,10 @@ using System.Xml.Serialization;
 namespace BlueprintLib
 {
 	[Serializable]
-	public class ClassDefinition : ObjectDefinition
+	public class ClassDefinition : ObjectDefinition, IAttributeContainer
 	{
 
+		IEnumerable<AttributeDefinition> IAttributeContainer.Attributes => Attributes;
 		public List<AttributeDefinition> Attributes
 		{
 			get;
@@ -28,6 +29,7 @@ namespace BlueprintLib
 			get;
 			private set;
 		}
+
 
 		public  ClassDefinition()
 		{

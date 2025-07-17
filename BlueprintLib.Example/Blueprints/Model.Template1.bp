@@ -24,7 +24,7 @@ namespace {{class.namespace}}
 
 		
 		{{- for property in class.properties }}
-		{{- if !(property.attributes | contains_attribute "System.Xml.Serialization.XmlIgnoreAttribute") }}
+		{{- if !(property.attributes | contains "System.Xml.Serialization.XmlIgnoreAttribute") }}
 		public {{property.type_name}} {{property.name}}
 		{
 			get => dataSource.{{property.name}};

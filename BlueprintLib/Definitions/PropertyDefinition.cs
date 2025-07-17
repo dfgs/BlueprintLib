@@ -10,14 +10,16 @@ using System.Xml.Serialization;
 namespace BlueprintLib
 {
 	[Serializable]
-	public class PropertyDefinition : ObjectDefinition
+	public class PropertyDefinition : ObjectDefinition, IAttributeContainer, INamed
 	{
 
+		IEnumerable<AttributeDefinition> IAttributeContainer.Attributes => Attributes;
 		public List<AttributeDefinition> Attributes
 		{
 			get;
 			set;
 		}
+
 		[XmlAttribute]
 		public string Name { get;  set; }
 		[XmlAttribute]
