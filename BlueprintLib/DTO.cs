@@ -16,10 +16,7 @@ namespace BlueprintLib
 		{
 			get; set;
 		}
-
-			
-
-
+	
 		public List<AttributeDefinition> Attributes
 		{
 			get;

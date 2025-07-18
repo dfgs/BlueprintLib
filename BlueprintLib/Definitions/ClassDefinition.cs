@@ -9,7 +9,7 @@ using System.Xml.Serialization;
 namespace BlueprintLib
 {
 	[Serializable]
-	public class ClassDefinition : ObjectDefinition, IAttributeContainer
+	public class ClassDefinition : ObjectDefinition, IAttributeContainer,INamed
 	{
 
 		IEnumerable<AttributeDefinition> IAttributeContainer.Attributes => Attributes;

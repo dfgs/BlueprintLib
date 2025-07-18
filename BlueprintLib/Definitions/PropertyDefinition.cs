@@ -25,6 +25,11 @@ namespace BlueprintLib
 		[XmlAttribute]
 		public string TypeName { get;  set; }
 
+		[XmlIgnore]
+		public bool IsNullable
+		{
+			get { return TypeName.EndsWith("?"); }
+		}
 
 		public PropertyDefinition() : base()
 		{
