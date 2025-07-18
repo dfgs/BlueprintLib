@@ -15,7 +15,8 @@ namespace BlueprintLib.Definitions
 			set;
 		}
 
-			
+		
+
 		public List<ClassDefinition> Classes
 		{
 			get;
@@ -31,18 +32,26 @@ namespace BlueprintLib.Definitions
 		public ProjectDefinition()
 		{
 			this.AssemblyName = "Undefined";
-			Classes = new List<ClassDefinition>();
-			References = new List<string>();
+			this.Classes = new List<ClassDefinition>();
+			this.References = new List<string>();
 		}
 		public ProjectDefinition(string AssemblyName)
 		{
 			this.AssemblyName = AssemblyName;
-			Classes = new List<ClassDefinition>();
-			References = new List<string>();
+			this.Classes = new List<ClassDefinition>();
+			this.References = new List<string>();
 		}
 		public override string ToString()
 		{
-			return $$"""{{AssemblyName}}{{"\r\n"}}{{{"\r\n\t"}}{{string.Join("\r\n	", Classes)}}{{"\r\n"}}}{{string.Join("\r\n	", References)}}""";
+			return 
+				$$"""
+				{{AssemblyName}}
+				{
+					{{string.Join("\r\n\t", Classes.SelectMany(item=>item.ToString().Split('\r','\n').Where(item=>!string.IsNullOrEmpty(item)))) }}
+					References:
+					{{string.Join("\r\n\t", References)}}
+				}
+				""";
 		}
 
 		

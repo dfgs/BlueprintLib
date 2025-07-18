@@ -45,7 +45,13 @@ namespace BlueprintLib
 		}
 		public override string ToString()
 		{
-			return $$"""[{{string.Join(",", Attributes)}}] {{Name}}""";
+			if (Attributes.Any()) return 
+				$$"""
+				[{{string.Join(",", Attributes)}}] 
+				{{Name}}
+				""";
+			else return
+				$$"""{{TypeName}} {{Name}}""";
 		}
 
 		

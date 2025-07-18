@@ -83,11 +83,18 @@ namespace BlueprintLib
 			IncrementalValuesProvider<Blueprint> blueprintFileProvider;
 			IncrementalValuesProvider<DTO> dtoFileProvider;
 			IncrementalValuesProvider<TypeDeclarationSyntax> typeDeclarationSyntaxProvider;
+			IncrementalValuesProvider<string> referencesProvider;
 
 
 			// register static files
 			context.RegisterPostInitializationOutput(incrementalGeneratorPostInitializationContext => incrementalGeneratorPostInitializationContext.AddSource($"Attributes/{BlueprintAttributeName}.g.cs", SourceText.From(BlueprintAttributeSourceCode, Encoding.UTF8)));
 			context.RegisterPostInitializationOutput(incrementalGeneratorPostInitializationContext => incrementalGeneratorPostInitializationContext.AddSource($"Attributes/{DTOAttributeName}.g.cs", SourceText.From(DTOAttributeSourceCode, Encoding.UTF8)));
+
+			// provide dependency dlls
+			referencesProvider = context.MetadataReferencesProvider.Where(metadataReference => metadataReference is CompilationReference compilationReference)
+			.Select((assemblyMetadata, cancellationToken) => 
+				assemblyMetadata.Display??"Undefined"
+			);
 
 			// provide blueprint files
 			blueprintFileProvider = context.AdditionalTextsProvider.Where(additionalText => Path.GetExtension(additionalText.Path) == ".bp")
@@ -114,9 +121,10 @@ namespace BlueprintLib
 			
 			IncrementalValueProvider<ProjectDefinition> projectDefinitionProvider =
 				context.CompilationProvider
+				.Combine(referencesProvider.Collect())
 				.Combine(typeDeclarationSyntaxProvider.Collect())
 				.Combine(dtoFileProvider.Collect())
-				.Select((combined, cancelationToken) => GenerateProjectDefinition(combined.Left.Left, combined.Left.Right,combined.Right));
+				.Select((combined, cancelationToken) => GenerateProjectDefinition(combined.Left.Left.Left,combined.Left.Left.Right, combined.Left.Right,combined.Right));
 
 			IncrementalValueProvider<(ProjectDefinition ProjectDefinition, ImmutableArray<Blueprint> Blueprints)> sourceContextProvider =
 				projectDefinitionProvider.
@@ -177,7 +185,7 @@ namespace BlueprintLib
 			}
 		}
 
-		private static ProjectDefinition GenerateProjectDefinition(Compilation Compilation, ImmutableArray<TypeDeclarationSyntax> TypeDeclarations, ImmutableArray<DTO> DTOs)
+		private static ProjectDefinition GenerateProjectDefinition(Compilation Compilation,ImmutableArray<string> References,  ImmutableArray<TypeDeclarationSyntax> TypeDeclarations, ImmutableArray<DTO> DTOs)
 		{
 			INamedTypeSymbol? typeSymbol;
 			string nameSpace;
@@ -189,6 +197,7 @@ namespace BlueprintLib
 
 
 			projectDefinition = new ProjectDefinition(Compilation.AssemblyName??"noname");
+			projectDefinition.References.AddRange(References);
 
 			foreach (TypeDeclarationSyntax typeDeclaration in TypeDeclarations)
 			{

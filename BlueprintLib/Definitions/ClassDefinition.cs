@@ -46,7 +46,14 @@ namespace BlueprintLib
 		}
 		public override string ToString()
 		{
-			return $$"""[{{string.Join(",", Attributes)}}]{{"\r\n"}}{{Name}}{{"\r\n"}}{{{"\r\n\t"}}{{string.Join("\r\n	",Properties)}}{{"\r\n"}}}""" ;
+			return 
+				$$"""
+				[{{string.Join(",", Attributes)}}]
+				{{Name}}
+				{
+					{{string.Join("\r\n\t", Properties.SelectMany(item => item.ToString().Split('\r', '\n').Where(item => !string.IsNullOrEmpty(item))))}}
+				}
+				""" ;
 		}
 
 
