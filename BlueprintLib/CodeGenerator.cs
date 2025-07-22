@@ -268,9 +268,9 @@ namespace BlueprintLib
 
 			scriptObject = new ScriptObject();
 			// Declare a functions
-			scriptObject.Import("find", new Func<IEnumerable<INamed>, string, INamed?>((items, name) => items.Find(name) ));
-			scriptObject.Import("contains", new Func<IEnumerable<INamed>, string, bool>((items, name) => items.Contains(name) ));
-			scriptObject.Import("with_attribute", new Func<IEnumerable<IAttributeContainer>, string, IEnumerable<IAttributeContainer>>((items, name) => items.WithAttribute(name).ToArray()));
+			scriptObject.Import("find", (IEnumerable<INamed>  items, string name) => items.Find(name) );
+			scriptObject.Import("contains", (IEnumerable<INamed> items, string name) => items.Contains(name) );
+			scriptObject.Import("with_attribute", (IEnumerable<IAttributeContainer> items, string name) => items.WithAttribute(name).ToArray() );
 
 			scriptObject.Add("project", ProjectDefinition);
 
@@ -309,7 +309,7 @@ namespace BlueprintLib
 						else
 						{
 							source = $"#warning Blueprint {attributeParameterDefinition.Value} was not found, please check if compilation action is set to additional files";
-							SourceProductionContext.AddSource($"{classDefinition.Name}.{Path.GetFileName(attributeParameterDefinition.Value)}.g.cs", SourceText.From(source, Encoding.UTF8));
+							SourceProductionContext.AddSource($"{classDefinition.Name}.{Path.GetFileName(attributeParameterDefinition.Value.Trim('*'))}.g.cs", SourceText.From(source, Encoding.UTF8));
 						}
 
 					}
