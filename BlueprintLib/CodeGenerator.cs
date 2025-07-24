@@ -40,7 +40,7 @@ namespace BlueprintLib
 		
 		namespace {{Namespace}}
 		{
-			[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+			[AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = true)]
 			internal class {{BlueprintAttributeName}} : Attribute
 			{
 				public string Name
@@ -62,7 +62,7 @@ namespace BlueprintLib
 		
 		namespace {{Namespace}}
 		{
-			[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+			[AttributeUsage(AttributeTargets.Class| AttributeTargets.Interface, AllowMultiple = true)]
 			internal class {{DTOAttributeName}} : Attribute
 			{
 				public string Name
@@ -112,7 +112,7 @@ namespace BlueprintLib
 			#pragma warning disable CS8619 // La nullabilité des types référence dans la valeur ne correspond pas au type cible.
 			typeDeclarationSyntaxProvider = context.SyntaxProvider.CreateSyntaxProvider
 			(
-				(syntaxNode, cancellationToken) => (syntaxNode is ClassDeclarationSyntax classDeclatationSyntax) ,
+				(syntaxNode, cancellationToken) => (syntaxNode is ClassDeclarationSyntax classDeclatationSyntax) || (syntaxNode is InterfaceDeclarationSyntax interfaceDeclatationSyntax),
 				transform: static (GeneratorSyntaxContext, _) => GeneratorSyntaxContext.Node as TypeDeclarationSyntax
 			)
 			.Where(typeDeclarationSyntax => typeDeclarationSyntax != null);
