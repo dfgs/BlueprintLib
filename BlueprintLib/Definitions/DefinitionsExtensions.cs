@@ -27,7 +27,11 @@ namespace BlueprintLib.Definitions
 			if (Items == null) return null;
 			return Items.Where(item=>item.Attributes.Contains(Name));
 		}
-		
+		public static IEnumerable<INamed>? WithName(this IEnumerable<INamed> Items, string Name)
+		{
+			if (Items == null) return null;
+			return Items.Where(item => item.MatchesName(Name));
+		}
 
 	}
 }
